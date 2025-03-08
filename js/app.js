@@ -1,6 +1,11 @@
 // Fetch songs.json from the same repository
 fetch('./songs.json')
-  .then(response => response.json())
+  .then(response => {
+    if (!response.ok) {
+      throw new Error("Failed to load songs.json");
+    }
+    return response.json();
+  })
   .then(data => {
     songs = data;
     console.log("Songs loaded:", songs);
@@ -15,6 +20,9 @@ async function getSongs(folder) {
   currFolder = folder;
   try {
     let a = await fetch(`./${folder}/`);
+    if (!a.ok) {
+      throw new Error(`Failed to load folder: ${folder}`);
+    }
     let response = await a.text();
     let div = document.createElement("div");
     div.innerHTML = response;
@@ -55,6 +63,10 @@ async function getSongs(folder) {
 }
 
 const playMusic = (track, pause = false) => {
+  if (!track) {
+    console.error("No track provided");
+    return;
+  }
   currentSong.src = `./${currFolder}/` + track;
   if (!pause) {
     currentSong.play();
@@ -67,6 +79,9 @@ const playMusic = (track, pause = false) => {
 async function displayAlbums() {
   try {
     let a = await fetch(`./songs/`);
+    if (!a.ok) {
+      throw new Error("Failed to load songs folder");
+    }
     let response = await a.text();
     let div = document.createElement("div");
     div.innerHTML = response;
@@ -79,6 +94,9 @@ async function displayAlbums() {
         let folder = e.href.split("/").slice(-1)[0];
         // Get the metadata of the folder
         let a = await fetch(`./songs/${folder}/info.json`);
+        if (!a.ok) {
+          throw new Error(`Failed to load info.json for folder: ${folder}`);
+        }
         let response = await a.json();
         cardContainer.innerHTML = cardContainer.innerHTML + `<div data-folder="${folder}" class="card">
                       <div class="play">

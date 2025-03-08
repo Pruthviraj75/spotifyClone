@@ -117,7 +117,11 @@ async function displayAlbums() {
       e.addEventListener("click", async item => {
         console.log("Fetching Songs");
         songs = await getSongs(`songs/${item.currentTarget.dataset.folder}`);
-        playMusic(songs[0]);
+        if (songs.length > 0) {
+          playMusic(songs[0]);
+        } else {
+          console.error("No songs found in the folder");
+        }
       });
     });
   } catch (error) {
@@ -128,7 +132,13 @@ async function displayAlbums() {
 async function main() {
   // Get the list of all songs
   await getSongs("songs/ncs");
-  playMusic(songs[0], true);
+
+  // Ensure songs array is populated
+  if (songs.length > 0) {
+    playMusic(songs[0], true);
+  } else {
+    console.error("No songs found in the folder");
+  }
 
   // Display all the albums on the page
   await displayAlbums();
